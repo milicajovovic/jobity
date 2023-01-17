@@ -1,0 +1,9 @@
+go 1.18
+
+use (
+	./src/ad-service
+	./src/admin-service
+	./src/employee-service
+	./src/employer-service
+	./src/grade-service
+)
