@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	db  *gorm.DB
+	DB  *gorm.DB
 	err error
 	ads = []models.Ad{
 		{
@@ -32,14 +32,14 @@ var (
 
 func InitDB() {
 	dsn := "host=localhost user=postgres password=postgres dbname=ads port=5432 sslmode=disable"
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	db.Migrator().DropTable("ads")
-	db.AutoMigrate(&models.Ad{})
+	DB.Migrator().DropTable("ads")
+	DB.AutoMigrate(&models.Ad{})
 	for _, ad := range ads {
-		db.Create(&ad)
+		DB.Create(&ad)
 	}
 }

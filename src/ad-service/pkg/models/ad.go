@@ -1,12 +1,27 @@
 package models
 
-import "github.com/lib/pq"
+import (
+	"employer-service/pkg/models"
+
+	"github.com/lib/pq"
+)
 
 type Ad struct {
-	ID             uint
+	ID             int
 	Name           string
-	EmployerID     uint
+	EmployerID     int
 	Description    string
 	JobType        pq.StringArray `gorm:"type:varchar(64)[]"`
 	RequierdSkills pq.StringArray `gorm:"type:varchar(64)[]"`
+}
+
+func (ad *Ad) AdToDTO(employer models.EmployerDTO) AdDTO {
+	return AdDTO{
+		ID:             ad.ID,
+		Name:           ad.Name,
+		Employer:       employer,
+		Description:    ad.Description,
+		JobType:        ad.JobType,
+		RequierdSkills: ad.RequierdSkills,
+	}
 }

@@ -7,7 +7,7 @@ import (
 
 func GetAll() ([]models.EmployerDTO, error) {
 	var employers []models.Employer
-	result := config.DB.Debug().Find(&employers)
+	result := config.DB.Find(&employers)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -27,6 +27,5 @@ func GetById(id int) (models.EmployerDTO, error) {
 	if result.Error != nil {
 		return models.EmployerDTO{}, result.Error
 	}
-
 	return employer.EmployerToDTO(), nil
 }
