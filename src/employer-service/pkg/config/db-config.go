@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	db        *gorm.DB
+	DB        *gorm.DB
 	err       error
 	employers = []models.Employer{
 		{
@@ -43,14 +43,14 @@ func HashPassword(password string) string {
 
 func InitDB() {
 	dsn := "host=localhost user=postgres password=postgres dbname=employers port=5432 sslmode=disable"
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	db.Migrator().DropTable("employers")
-	db.AutoMigrate(&models.Employer{})
+	DB.Migrator().DropTable("employers")
+	DB.AutoMigrate(&models.Employer{})
 	for _, employer := range employers {
-		db.Create(&employer)
+		DB.Create(&employer)
 	}
 }

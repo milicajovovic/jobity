@@ -7,3 +7,12 @@ type Employer struct {
 	Name     string
 	Address  string
 }
+
+func (employer *Employer) EmployerToDTO() EmployerDTO {
+	return EmployerDTO{
+		ID:      employer.ID,
+		Email:   employer.Email,
+		Name:    employer.Name,
+		Address: employer.Address,
+	}
+}
