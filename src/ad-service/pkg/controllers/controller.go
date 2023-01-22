@@ -28,14 +28,14 @@ func GetById(c *fiber.Ctx) error {
 	paramId := c.Params("id")
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Invalid ID")
+		return fiber.NewError(fiber.StatusBadRequest, "invalid ID")
 	}
 
-	employer, err := services.GetById(id)
+	ad, err := services.GetById(id)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
-	return c.Status(fiber.StatusOK).JSON(employer)
+	return c.Status(fiber.StatusOK).JSON(ad)
 }
 
 func Search(c *fiber.Ctx) error {

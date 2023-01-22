@@ -10,23 +10,19 @@ import (
 )
 
 var (
-	db     *gorm.DB
+	DB     *gorm.DB
 	err    error
 	grades = []models.Grade{
 		{
 			EmployerID:    1,
+			EmployeeID:    1,
 			Grade:         5,
 			Comment:       "Great working conditions!",
 			Inappropriate: false,
 		},
 		{
-			EmployerID:    1,
-			Grade:         5,
-			Comment:       "Perfect place to learn!",
-			Inappropriate: false,
-		},
-		{
 			EmployerID:    2,
+			EmployeeID:    2,
 			Grade:         3,
 			Comment:       "Not worth it...",
 			Inappropriate: false,
@@ -36,14 +32,14 @@ var (
 
 func InitDB() {
 	dsn := "host=localhost user=postgres password=postgres dbname=grades port=5432 sslmode=disable"
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	db.Migrator().DropTable("grades")
-	db.AutoMigrate(&models.Grade{})
+	DB.Migrator().DropTable("grades")
+	DB.AutoMigrate(&models.Grade{})
 	for _, grade := range grades {
-		db.Create(&grade)
+		DB.Create(&grade)
 	}
 }

@@ -29,3 +29,19 @@ func GetById(id int) (models.EmployerDTO, error) {
 	}
 	return employer.EmployerToDTO(), nil
 }
+
+func UniqueEmail(email string) bool {
+	var employer models.Employer
+	result := config.DB.Where("email = ?", email).First(&employer)
+	return result.Error != nil
+}
+
+func Create(employer models.Employer) (models.EmployerDTO, error) {
+	employer.Password = config.HashPassword(employer.Password)
+	result := config.DB.Create(&employer)
+
+	if result.Error != nil {
+		return models.EmployerDTO{}, result.Error
+	}
+	return employer.EmployerToDTO(), nil
+}
