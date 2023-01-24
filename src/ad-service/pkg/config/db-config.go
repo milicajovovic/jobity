@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -17,15 +18,17 @@ var (
 			Name:           "Chef",
 			EmployerID:     1,
 			Description:    "Culinary professional trained in all aspects of food preparation.",
+			Posted:         time.Date(2022, 11, 12, 0, 0, 0, 0, time.Local),
 			JobType:        []string{"Kitchen", "Full time"},
-			RequierdSkills: []string{"Organisation", "Multitasking", "Creativity"},
+			RequiredSkills: []string{"Organisation", "Multitasking", "Creativity"},
 		},
 		{
 			Name:           "Food Prep",
 			EmployerID:     1,
 			Description:    "Preparing ingredients for dishes to help the kitchen staff.",
+			Posted:         time.Date(2023, 01, 12, 0, 0, 0, 0, time.Local),
 			JobType:        []string{"Kitchen", "Part time", "Morning shift"},
-			RequierdSkills: []string{"Organisation", "Multitasking", "Team work"},
+			RequiredSkills: []string{"Organisation", "Multitasking", "Team work"},
 		},
 	}
 )

@@ -75,7 +75,7 @@ func GetRequiredSkills(c *fiber.Ctx) error {
 
 	var requiredSkills []string
 	for _, ad := range ads {
-		requiredSkills = append(requiredSkills, ad.RequierdSkills...)
+		requiredSkills = append(requiredSkills, ad.RequiredSkills...)
 	}
 	requiredSkills = removeDuplicates(requiredSkills)
 

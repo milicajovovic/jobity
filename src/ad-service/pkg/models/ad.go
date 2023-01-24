@@ -1,7 +1,7 @@
 package models
 
 import (
-	"employer-service/pkg/models"
+	"time"
 
 	"github.com/lib/pq"
 )
@@ -11,17 +11,7 @@ type Ad struct {
 	Name           string
 	EmployerID     int
 	Description    string
+	Posted         time.Time
 	JobType        pq.StringArray `gorm:"type:varchar(64)[]"`
-	RequierdSkills pq.StringArray `gorm:"type:varchar(64)[]"`
-}
-
-func (ad *Ad) AdToDTO(employer models.EmployerDTO) AdDTO {
-	return AdDTO{
-		ID:             ad.ID,
-		Name:           ad.Name,
-		Employer:       employer,
-		Description:    ad.Description,
-		JobType:        ad.JobType,
-		RequierdSkills: ad.RequierdSkills,
-	}
+	RequiredSkills pq.StringArray `gorm:"type:varchar(64)[]"`
 }
