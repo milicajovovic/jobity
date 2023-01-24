@@ -18,7 +18,7 @@ function FilterForm({ ads, changeAds }) {
         });
     }, []);
 
-    const typeChanged = (event) => {
+    const typesChanged = (event) => {
         if (event.target.checked) {
             checkedTypes.push(event.target.id);
         } else {
@@ -28,7 +28,7 @@ function FilterForm({ ads, changeAds }) {
         filterAds();
     };
 
-    const skillChanged = (event) => {
+    const skillsChanged = (event) => {
         if (event.target.checked) {
             checkedSkills.push(event.target.id);
         } else {
@@ -57,7 +57,7 @@ function FilterForm({ ads, changeAds }) {
                         label={type}
                         inline
                         type="checkbox"
-                        onChange={typeChanged}
+                        onChange={typesChanged}
                     />
                 ))}
             </div>
@@ -69,7 +69,7 @@ function FilterForm({ ads, changeAds }) {
                         label={skill}
                         inline
                         type="checkbox"
-                        onChange={skillChanged}
+                        onChange={skillsChanged}
                     />
                 ))}
             </div>

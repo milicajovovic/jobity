@@ -22,7 +22,7 @@ function Home() {
     }
 
     return (
-        <Container className="vh-100 gradient" fluid>
+        <Container fluid>
             <Row>
                 <NavigationBar />
             </Row>

@@ -16,22 +16,25 @@ var (
 	err       error
 	employers = []models.Employer{
 		{
-			Email:    "foody@gmail.com",
-			Password: HashPassword("foody123"),
-			Name:     "Foody",
-			Address:  "West Street 5",
+			Email:          "foody@gmail.com",
+			Password:       HashPassword("foody123"),
+			Name:           "Foody",
+			Address:        "West Street 5",
+			ProfilePicture: "https://picsum.photos/200",
 		},
 		{
-			Email:    "abank@gmail.com",
-			Password: HashPassword("abank321"),
-			Name:     "A-Bank",
-			Address:  "North Street 15",
+			Email:          "abank@gmail.com",
+			Password:       HashPassword("abank321"),
+			Name:           "A-Bank",
+			Address:        "North Street 15",
+			ProfilePicture: "https://picsum.photos/200",
 		},
 		{
-			Email:    "itsoft@gmail.com",
-			Password: HashPassword("itsoft123"),
-			Name:     "IT Soft",
-			Address:  "East Street 49",
+			Email:          "itsoft@gmail.com",
+			Password:       HashPassword("itsoft123"),
+			Name:           "IT Soft",
+			Address:        "East Street 49",
+			ProfilePicture: "https://picsum.photos/200",
 		},
 	}
 )
