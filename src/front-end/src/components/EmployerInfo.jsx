@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from 'react-bootstrap/Modal';
-import GradesInfo from "./GradesInfo";
+import ReviewsInfo from "./ReviewsInfo";
 
 function EmployerInfo(props) {
     return (
@@ -15,7 +15,7 @@ function EmployerInfo(props) {
             </Modal.Header>
             <Modal.Body>
                 <p>Address: {props.employer.Address}</p>
-                <GradesInfo employerID={props.employer.ID}/>
+                <ReviewsInfo employerID={props.employer.ID}/>
             </Modal.Body>
         </Modal>
     );

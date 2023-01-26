@@ -14,4 +14,5 @@ type Ad struct {
 	Posted         time.Time
 	JobType        pq.StringArray `gorm:"type:varchar(64)[]"`
 	RequiredSkills pq.StringArray `gorm:"type:varchar(64)[]"`
+	Deleted        bool
 }

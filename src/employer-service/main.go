@@ -17,5 +17,5 @@ func main() {
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 	controllers.SetupRoutes(app)
-	app.Listen(":3003")
+	app.Listen(":3004")
 }

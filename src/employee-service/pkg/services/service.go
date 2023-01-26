@@ -85,3 +85,14 @@ func PdfToEmployee(content []string) models.Employee {
 	}
 	return employee
 }
+
+func Update(employee models.Employee) (models.EmployeeDTO, error) {
+	if repositories.UniqueEmail(employee.Email) {
+		return repositories.Update(employee)
+	}
+	return models.EmployeeDTO{}, errors.New("email must be unique")
+}
+
+func Login(dto models.LoginDTO) (models.EmployeeDTO, error) {
+	return repositories.Login(dto)
+}

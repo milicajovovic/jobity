@@ -6,13 +6,13 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"grade-service/pkg/models"
+	"review-service/pkg/models"
 )
 
 var (
-	DB     *gorm.DB
-	err    error
-	grades = []models.Grade{
+	DB      *gorm.DB
+	err     error
+	reviews = []models.Review{
 		{
 			EmployerID:    1,
 			EmployeeID:    1,
@@ -31,15 +31,15 @@ var (
 )
 
 func InitDB() {
-	dsn := "host=localhost user=postgres password=postgres dbname=grades port=5432 sslmode=disable"
+	dsn := "host=localhost user=postgres password=postgres dbname=reviews port=5432 sslmode=disable"
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	DB.Migrator().DropTable("grades")
-	DB.AutoMigrate(&models.Grade{})
-	for _, grade := range grades {
-		DB.Create(&grade)
+	DB.Migrator().DropTable("reviews")
+	DB.AutoMigrate(&models.Review{})
+	for _, review := range reviews {
+		DB.Create(&review)
 	}
 }

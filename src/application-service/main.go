@@ -1,8 +1,8 @@
 package main
 
 import (
-	"grade-service/pkg/config"
-	"grade-service/pkg/controllers"
+	"application-service/pkg/config"
+	"application-service/pkg/controllers"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -17,5 +17,5 @@ func main() {
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 	controllers.SetupRoutes(app)
-	app.Listen(":3004")
+	app.Listen(":3002")
 }

@@ -2,27 +2,27 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
 
-function GradesInfo({ employerID }) {
-    const [grades, setGrades] = useState([]);
+function ReviewsInfo({ employerID }) {
+    const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
         axios.get("http://localhost:3004/employer/" + employerID).then(res => {
-            setGrades(res.data);
+            setReviews(res.data);
         });
         // eslint-disable-next-line
     }, []);
 
     return (
         <div>
-            {grades.map(grade => (
-                <div key={grade.ID}>
+            {reviews.map(review => (
+                <div key={review.ID}>
                     <hr />
-                    {[...Array(grade.Grade)].map((v, i) => <FaStar key={i} />)}
-                    <p>{grade.Comment}</p>
+                    {[...Array(review.Grade)].map((v, i) => <FaStar key={i} />)}
+                    <p>{review.Comment}</p>
                 </div>
             ))}
         </div>
     )
 }
 
-export default GradesInfo
+export default ReviewsInfo
