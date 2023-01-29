@@ -1,7 +1,7 @@
 package models
 
 type Admin struct {
-	ID       uint
+	ID       int
 	Email    string
 	Password string
 }

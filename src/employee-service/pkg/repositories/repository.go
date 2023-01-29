@@ -6,29 +6,24 @@ import (
 	"errors"
 )
 
-func GetAll() ([]models.EmployeeDTO, error) {
+func GetAll() ([]models.Employee, error) {
 	var employees []models.Employee
 	result := config.DB.Find(&employees)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
-
-	var dtos []models.EmployeeDTO
-	for _, employer := range employees {
-		dtos = append(dtos, employer.EmployeeToDTO())
-	}
-	return dtos, nil
+	return employees, nil
 }
 
-func GetById(id int) (models.EmployeeDTO, error) {
+func GetById(id int) (models.Employee, error) {
 	var employee models.Employee
 	result := config.DB.First(&employee, id)
 
 	if result.Error != nil {
-		return models.EmployeeDTO{}, result.Error
+		return models.Employee{}, result.Error
 	}
-	return employee.EmployeeToDTO(), nil
+	return employee, nil
 }
 
 func UniqueEmail(email string) bool {
@@ -37,24 +32,24 @@ func UniqueEmail(email string) bool {
 	return result.Error != nil
 }
 
-func Create(employee models.Employee) (models.EmployeeDTO, error) {
+func Create(employee models.Employee) (models.Employee, error) {
 	employee.Password = config.HashPassword(employee.Password)
 	result := config.DB.Create(&employee)
 
 	if result.Error != nil {
-		return models.EmployeeDTO{}, result.Error
+		return models.Employee{}, result.Error
 	}
-	return employee.EmployeeToDTO(), nil
+	return employee, nil
 }
 
-func Update(employee models.Employee) (models.EmployeeDTO, error) {
+func Update(employee models.Employee) (models.Employee, error) {
 	employee.Password = config.HashPassword(employee.Password)
 	result := config.DB.Save(&employee)
 
 	if result.Error != nil {
-		return models.EmployeeDTO{}, result.Error
+		return models.Employee{}, result.Error
 	}
-	return employee.EmployeeToDTO(), nil
+	return employee, nil
 }
 
 func GetByEmail(email string) (models.Employee, error) {
@@ -67,14 +62,14 @@ func GetByEmail(email string) (models.Employee, error) {
 	return employee, nil
 }
 
-func Login(dto models.LoginDTO) (models.EmployeeDTO, error) {
+func Login(dto models.LoginDTO) (models.Employee, error) {
 	employee, err := GetByEmail(dto.Email)
 	if err != nil {
-		return models.EmployeeDTO{}, errors.New("email is not valid")
+		return models.Employee{}, errors.New("email is not valid")
 	}
 
 	if !config.CheckPasswordHash(dto.Password, employee.Password) {
-		return models.EmployeeDTO{}, errors.New("password is not valid")
+		return models.Employee{}, errors.New("password is not valid")
 	}
-	return employee.EmployeeToDTO(), nil
+	return employee, nil
 }

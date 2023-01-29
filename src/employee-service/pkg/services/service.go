@@ -10,25 +10,25 @@ import (
 	"github.com/ledongthuc/pdf"
 )
 
-func GetAll() ([]models.EmployeeDTO, error) {
+func GetAll() ([]models.Employee, error) {
 	return repositories.GetAll()
 }
 
-func GetById(id int) (models.EmployeeDTO, error) {
+func GetById(id int) (models.Employee, error) {
 	return repositories.GetById(id)
 }
 
-func RegisterForm(employee models.Employee) (models.EmployeeDTO, error) {
+func RegisterForm(employee models.Employee) (models.Employee, error) {
 	if repositories.UniqueEmail(employee.Email) {
 		return repositories.Create(employee)
 	}
-	return models.EmployeeDTO{}, errors.New("email must be unique")
+	return models.Employee{}, errors.New("email must be unique")
 }
 
-func RegisterPdf(dto models.RegisterDTO) (models.EmployeeDTO, error) {
+func RegisterPdf(dto models.RegisterDTO) (models.Employee, error) {
 	content, err := ReadPdf("data/" + dto.PdfPath)
 	if err != nil {
-		return models.EmployeeDTO{}, err
+		return models.Employee{}, err
 	}
 
 	employee := PdfToEmployee(content)
@@ -38,7 +38,7 @@ func RegisterPdf(dto models.RegisterDTO) (models.EmployeeDTO, error) {
 		return repositories.Create(employee)
 	}
 
-	return models.EmployeeDTO{}, errors.New("email must be unique")
+	return models.Employee{}, errors.New("email must be unique")
 }
 
 func ReadPdf(path string) ([]string, error) {
@@ -86,13 +86,13 @@ func PdfToEmployee(content []string) models.Employee {
 	return employee
 }
 
-func Update(employee models.Employee) (models.EmployeeDTO, error) {
+func Update(employee models.Employee) (models.Employee, error) {
 	if repositories.UniqueEmail(employee.Email) {
 		return repositories.Update(employee)
 	}
-	return models.EmployeeDTO{}, errors.New("email must be unique")
+	return models.Employee{}, errors.New("email must be unique")
 }
 
-func Login(dto models.LoginDTO) (models.EmployeeDTO, error) {
+func Login(dto models.LoginDTO) (models.Employee, error) {
 	return repositories.Login(dto)
 }

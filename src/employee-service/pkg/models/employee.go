@@ -7,9 +7,9 @@ import (
 )
 
 type Employee struct {
-	ID             uint
+	ID             int
 	Email          string
-	Password       string
+	Password       string `json:"-"`
 	FirstName      string
 	LastName       string
 	Birthday       time.Time
@@ -20,21 +20,4 @@ type Employee struct {
 	CV             string
 	Blocked        bool
 	Deleted        bool
-}
-
-func (employee *Employee) EmployeeToDTO() EmployeeDTO {
-	return EmployeeDTO{
-		ID:             employee.ID,
-		Email:          employee.Email,
-		FirstName:      employee.FirstName,
-		LastName:       employee.LastName,
-		Birthday:       employee.Birthday,
-		Education:      employee.Education,
-		JobType:        employee.JobType,
-		Skills:         employee.Skills,
-		ProfilePicture: employee.ProfilePicture,
-		CV:             employee.CV,
-		Blocked:        employee.Blocked,
-		Deleted:        employee.Deleted,
-	}
 }

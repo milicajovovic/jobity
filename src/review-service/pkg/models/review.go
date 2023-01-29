@@ -1,9 +1,9 @@
 package models
 
 type Review struct {
-	ID            uint
-	EmployerID    uint
-	EmployeeID    uint
+	ID            int
+	EmployerID    int
+	EmployeeID    int
 	Grade         int
 	Comment       string
 	Inappropriate bool
