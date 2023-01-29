@@ -1,6 +1,7 @@
 package routes
 
 import (
+	apimodels "api-gateway/pkg/models"
 	"api-gateway/pkg/utils"
 	"bytes"
 	"employee-service/pkg/models"
@@ -9,157 +10,201 @@ import (
 	"net/http"
 
 	fibercasbin "github.com/arsmn/fiber-casbin/v2"
+	"github.com/casbin/casbin/v2"
 	"github.com/gofiber/fiber/v2"
 )
 
-const apiPrefix = "/employees"
-const url = "http://localhost:3003"
+const employeePrefix = "/employees"
+const employeeUrl = "http://localhost:3003"
 
-func SetupEmployeeRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware) {
-	app.Get(apiPrefix+"/", auth.RequiresRoles([]string{"admin"}), GetAll)
-	app.Get(apiPrefix+"/:id", GetById)
-	app.Post(apiPrefix+"/register/form", RegisterForm)
-	app.Post(apiPrefix+"/register/pdf", RegisterPdf)
-	app.Post(apiPrefix+"/update", auth.RequiresRoles([]string{"employee"}), Update)
-	app.Post(apiPrefix+"/login", Login)
-}
+func SetupEmployeeRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware, enforcer *casbin.Enforcer) {
+	// Get all employees
+	app.Get(employeePrefix+"/", auth.RequiresRoles([]string{"admin"}), func(c *fiber.Ctx) error {
+		response, err := http.Get(employeeUrl)
 
-func GetAll(c *fiber.Ctx) error {
-	response, err := http.Get(url)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		defer response.Body.Close()
 
-	defer response.Body.Close()
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
 
-	if response.Status != "200 OK" {
-		body, _ := io.ReadAll(response.Body)
-		return fiber.NewError(response.StatusCode, string(body))
-	}
+		var employees []models.Employee
+		err = json.NewDecoder(response.Body).Decode(&employees)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	var employees []models.Employee
-	err = json.NewDecoder(response.Body).Decode(&employees)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		return c.Status(response.StatusCode).JSON(employees)
+	})
 
-	return c.Status(response.StatusCode).JSON(employees)
-}
+	// Get employee by id
+	app.Get(employeePrefix+"/employee/:id", auth.RequiresRoles([]string{"employee"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Get(employeeUrl + "/employee/" + paramId)
 
-func GetById(c *fiber.Ctx) error {
-	paramId := c.Params("id")
-	response, err := http.Get(url + "/employee/" + paramId)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		defer response.Body.Close()
 
-	defer response.Body.Close()
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
 
-	if response.Status != "200 OK" {
-		body, _ := io.ReadAll(response.Body)
-		return fiber.NewError(response.StatusCode, string(body))
-	}
+		var employee models.Employee
+		err = json.NewDecoder(response.Body).Decode(&employee)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	var employee models.Employee
-	err = json.NewDecoder(response.Body).Decode(&employee)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		return c.Status(response.StatusCode).JSON(employee)
+	})
 
-	return c.Status(response.StatusCode).JSON(employee)
-}
+	// Register employee through form
+	app.Post(employeePrefix+"/register/form", func(c *fiber.Ctx) error {
+		response, err := http.Post(employeeUrl+"/register/form", "application/json", bytes.NewBuffer(c.Body()))
 
-func RegisterForm(c *fiber.Ctx) error {
-	response, err := http.Post(url+"/register/form", "application/json", bytes.NewBuffer(c.Body()))
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		defer response.Body.Close()
 
-	defer response.Body.Close()
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
 
-	if response.Status != "200 OK" {
-		body, _ := io.ReadAll(response.Body)
-		return fiber.NewError(response.StatusCode, string(body))
-	}
+		var employee models.Employee
+		err = json.NewDecoder(response.Body).Decode(&employee)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	var employee models.Employee
-	err = json.NewDecoder(response.Body).Decode(&employee)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		enforcer.AddGroupingPolicy(employee.Email, "employee")
+		token, _ := utils.GenerateToken(employee.ID, employee.Email)
+		dto := apimodels.LoggedInDto{
+			Jwt:    token,
+			UserId: employee.ID,
+		}
 
-	return c.Status(response.StatusCode).JSON(employee)
-}
+		return c.Status(response.StatusCode).JSON(dto)
+	})
 
-func RegisterPdf(c *fiber.Ctx) error {
-	response, err := http.Post(url+"/register/pdf", "application/json", bytes.NewBuffer(c.Body()))
+	// Register employee through pdf
+	app.Post(employeePrefix+"/register/pdf", func(c *fiber.Ctx) error {
+		response, err := http.Post(employeeUrl+"/register/pdf", "application/json", bytes.NewBuffer(c.Body()))
 
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	defer response.Body.Close()
+		defer response.Body.Close()
 
-	if response.Status != "200 OK" {
-		body, _ := io.ReadAll(response.Body)
-		return fiber.NewError(response.StatusCode, string(body))
-	}
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
 
-	var employee models.Employee
-	err = json.NewDecoder(response.Body).Decode(&employee)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		var employee models.Employee
+		err = json.NewDecoder(response.Body).Decode(&employee)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	return c.Status(response.StatusCode).JSON(employee)
-}
+		enforcer.AddGroupingPolicy(employee.Email, "employee")
 
-func Update(c *fiber.Ctx) error {
-	response, err := http.Post(url+"/update", "application/json", bytes.NewBuffer(c.Body()))
+		token, _ := utils.GenerateToken(employee.ID, employee.Email)
+		dto := apimodels.LoggedInDto{
+			Jwt:    token,
+			UserId: employee.ID,
+		}
 
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		return c.Status(response.StatusCode).JSON(dto)
+	})
 
-	defer response.Body.Close()
+	// Update employee throught form
+	app.Post(employeePrefix+"/update/form", auth.RequiresRoles([]string{"employee"}), func(c *fiber.Ctx) error {
+		response, err := http.Post(employeeUrl+"/update/form", "application/json", bytes.NewBuffer(c.Body()))
 
-	if response.Status != "200 OK" {
-		body, _ := io.ReadAll(response.Body)
-		return fiber.NewError(response.StatusCode, string(body))
-	}
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	var employee models.Employee
-	err = json.NewDecoder(response.Body).Decode(&employee)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		defer response.Body.Close()
 
-	return c.Status(response.StatusCode).JSON(employee)
-}
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
 
-func Login(c *fiber.Ctx) error {
-	response, err := http.Post(url+"/login", "application/json", bytes.NewBuffer(c.Body()))
+		var employee models.Employee
+		err = json.NewDecoder(response.Body).Decode(&employee)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		return c.Status(response.StatusCode).JSON(employee)
+	})
 
-	defer response.Body.Close()
+	// Update employee throught pdf
+	app.Post(employeePrefix+"/update/pdf", auth.RequiresRoles([]string{"employee"}), func(c *fiber.Ctx) error {
+		response, err := http.Post(employeeUrl+"/update/pdf", "application/json", bytes.NewBuffer(c.Body()))
 
-	if response.Status != "200 OK" {
-		body, _ := io.ReadAll(response.Body)
-		return fiber.NewError(response.StatusCode, string(body))
-	}
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
 
-	var employee models.Employee
-	err = json.NewDecoder(response.Body).Decode(&employee)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+		defer response.Body.Close()
 
-	token, _ := utils.GenerateToken(employee.ID, employee.Email, "employee")
-	return c.Status(response.StatusCode).JSON(token)
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var employee models.Employee
+		err = json.NewDecoder(response.Body).Decode(&employee)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(employee)
+	})
+
+	// Login as an employee
+	app.Post(employeePrefix+"/login", func(c *fiber.Ctx) error {
+		response, err := http.Post(employeeUrl+"/login", "application/json", bytes.NewBuffer(c.Body()))
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var employee models.Employee
+		err = json.NewDecoder(response.Body).Decode(&employee)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		token, _ := utils.GenerateToken(employee.ID, employee.Email)
+		dto := apimodels.LoggedInDto{
+			Jwt:    token,
+			UserId: employee.ID,
+		}
+
+		return c.Status(response.StatusCode).JSON(dto)
+	})
 }

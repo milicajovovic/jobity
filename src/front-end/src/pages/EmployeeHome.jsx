@@ -3,42 +3,38 @@ import React, { useEffect, useState } from "react";
 import { Col, Container, Row, Card, Button, Navbar } from "react-bootstrap";
 import AdCard from "../components/AdCard";
 import SearchForm from "../components/SearchForm";
-import FilterForm from "../components/FilterForm";
-import HomeMenu from "../components/HomeMenu";
+import EmployeeMenu from "../components/EmployeeMenu";
 
-function Home() {
-    const [allAds, setAllAds] = useState([]);
-    const [shownAds, setShownAds] = useState([]);
+function EmployeeHome() {
+    const [ads, setAds] = useState([]);
 
     useEffect(() => {
         axios.get("http://localhost:3007/ads").then(res => {
-            setAllAds(res.data);
-            setShownAds(res.data);
+            setAds(res.data);
         });
     }, []);
 
     const sortAds = () => {
-        setShownAds([].concat(shownAds).sort((a, b) => new Date(b.Posted) - new Date(a.Posted)))
+        setAds([].concat(ads).sort((a, b) => new Date(b.Posted) - new Date(a.Posted)))
     }
 
     return (
         <Container fluid>
             <Row>
-                <HomeMenu />
+                <EmployeeMenu />
             </Row>
             <Row>
                 <Navbar bg="light" className="searchBar">
                     <Container>
-                        <SearchForm changeAds={setShownAds} />
-                        <FilterForm ads={allAds} changeAds={setShownAds} />
+                        <SearchForm changeAds={setAds} />
                         <Button onClick={sortAds}>Sort by date</Button>
                     </Container>
                 </Navbar>
             </Row>
             <Row className="d-flex justify-content-center h-100 pt-5">
                 <Col md="auto">
-                    {shownAds.length > 0 ?
-                        shownAds.map(a => (
+                    {ads.length > 0 ?
+                        ads.map(a => (
                             <AdCard ad={a} key={a.ID} />
                         ))
                         : <Card body style={{ width: "40rem" }} className="text-center">There is no ads for chosen criteria</Card>
@@ -49,4 +45,4 @@ function Home() {
     )
 }
 
-export default Home
+export default EmployeeHome

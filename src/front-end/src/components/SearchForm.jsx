@@ -15,7 +15,7 @@ function SearchForm({ changeAds }) {
             searchDescription = "Description"
         }
 
-        axios.get("http://localhost:3001/search/" + searchName + "/" + searchDescription).then(res => {
+        axios.get("http://localhost:3007/ads/search/" + searchName + "/" + searchDescription).then(res => {
             changeAds(res.data);
         });
     }

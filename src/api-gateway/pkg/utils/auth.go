@@ -10,11 +10,10 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateToken(id int, email string, role string) (string, error) {
+func GenerateToken(id int, email string) (string, error) {
 	claims := jwt.MapClaims{
 		"userId": strconv.Itoa(id),
 		"email":  email,
-		"role":   role,
 		"exp":    time.Now().Add(time.Hour).Unix(),
 	}
 
@@ -44,7 +43,7 @@ func ParseToken(tokenString string) (string, error) {
 			return "", errors.New("unauthorized")
 		} else {
 			if token.Valid {
-				return claims["user"].(string), nil
+				return claims["userId"].(string), nil
 			} else {
 				return "", errors.New("unauthorized")
 			}

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"review-service/pkg/models"
 	"review-service/pkg/repositories"
 )
@@ -14,5 +15,8 @@ func GetByEmployerId(id int) ([]models.Review, error) {
 }
 
 func Create(review models.Review) (models.Review, error) {
-	return repositories.Create(review)
+	if repositories.IsUnique(review) {
+		return repositories.Create(review)
+	}
+	return models.Review{}, errors.New("you already left a review for this employer")
 }

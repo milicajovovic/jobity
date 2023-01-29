@@ -6,7 +6,7 @@ function ReviewsInfo({ employerID }) {
     const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:3004/employer/" + employerID).then(res => {
+        axios.get("http://localhost:3007/reviews/employer/" + employerID).then(res => {
             setReviews(res.data);
         });
         // eslint-disable-next-line

@@ -25,6 +25,12 @@ func GetById(id int) (models.Application, error) {
 	return application, nil
 }
 
+func IsUnique(adId int, employeeId int) bool {
+	var application models.Application
+	result := config.DB.Where("ad_id = ? AND employee_id = ?", adId, employeeId).First(&application)
+	return result.Error != nil
+}
+
 func Create(adId int, employeeId int) (models.Application, error) {
 	application := models.Application{
 		AdID:       adId,

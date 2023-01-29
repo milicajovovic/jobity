@@ -1,6 +1,8 @@
 package models
 
 type RegisterDTO struct {
-	PdfPath string
-	Passwod string
+	PdfPath    string
+	Email      string
+	Passwod    string
+	EmployeeID int
 }

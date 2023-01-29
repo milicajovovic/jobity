@@ -3,6 +3,7 @@ package services
 import (
 	"application-service/pkg/models"
 	"application-service/pkg/repositories"
+	"errors"
 )
 
 func GetAll() ([]models.Application, error) {
@@ -14,7 +15,10 @@ func GetById(id int) (models.Application, error) {
 }
 
 func Apply(adId int, employeeId int) (models.Application, error) {
-	return repositories.Create(adId, employeeId)
+	if repositories.IsUnique(adId, employeeId) {
+		return repositories.Create(adId, employeeId)
+	}
+	return models.Application{}, errors.New("you already applied for this job")
 }
 
 func GetAccepted(employeeId int) ([]models.Application, error) {

@@ -9,11 +9,11 @@ function FilterForm({ ads, changeAds }) {
     const [checkedSkills] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:3001/jobTypes").then(res => {
+        axios.get("http://localhost:3007/ads/jobTypes").then(res => {
             setTypes(res.data);
         });
 
-        axios.get("http://localhost:3001/requiredSkills").then(res => {
+        axios.get("http://localhost:3007/ads/requiredSkills").then(res => {
             setSkills(res.data);
         });
     }, []);

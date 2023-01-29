@@ -25,6 +25,12 @@ func GetByEmployerId(id int) ([]models.Review, error) {
 	return reviews, nil
 }
 
+func IsUnique(review models.Review) bool {
+	var existingReview models.Review
+	result := config.DB.Where("employer_id = ? AND employee_id = ?", review.EmployerID, review.EmployeeID).First(&existingReview)
+	return result.Error != nil
+}
+
 func Create(review models.Review) (models.Review, error) {
 	result := config.DB.Create(&review)
 

@@ -20,7 +20,7 @@ func main() {
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "http://localhost:3008",
-		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
 
 	db := config.InitDB()
@@ -64,11 +64,11 @@ func main() {
 	})
 
 	// routes.SetupAdminRoutes(app, auth)
-	// routes.SetupAdRoutes(app, auth)
-	// routes.SetupApplicationRoutes(app, auth)
-	routes.SetupEmployeeRoutes(app, auth)
-	// routes.SetupEmployerRoutes(app, auth)
-	// routes.SetupReviewRoutes(app, auth)
+	routes.SetupAdRoutes(app, auth)
+	routes.SetupApplicationRoutes(app, auth)
+	routes.SetupEmployeeRoutes(app, auth, enforcer)
+	routes.SetupEmployerRoutes(app, auth, enforcer)
+	routes.SetupReviewRoutes(app, auth)
 
 	app.Listen(":3007")
 }

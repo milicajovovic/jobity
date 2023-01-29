@@ -1,12 +1,12 @@
 import React from "react";
 import { Col, Container, Row, Card, Button } from "react-bootstrap";
-import NavigationBar from "../components/NavigationBar";
+import HomeMenu from "../components/HomeMenu";
 
 function RegisterHome() {
     return (
         <Container fluid>
             <Row>
-                <NavigationBar />
+                <HomeMenu />
             </Row>
             <Row className="d-flex justify-content-center h-100 pt-5">
                 <Col md="auto">

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, Toast, Form, Button, Container, Row, Col, Card } from "react-bootstrap";
-import NavigationBar from "../components/NavigationBar";
+import HomeMenu from "../components/HomeMenu";
 
 function RegisterEmployer() {
     const [show, setShow] = useState(false);
@@ -17,11 +17,13 @@ function RegisterEmployer() {
             "Password": event.target.password.value,
             "Name": event.target.name.value,
             "Address": event.target.address.value,
-            "ProfilePicture": event.target.profilePicture.value,
         };
 
         if (validEmail(newEmployer.Email)) {
-            axios.post("http://localhost:3003/register", newEmployer).then(res => {
+            axios.post("http://localhost:3007/employer/register", newEmployer).then(res => {
+                localStorage.setItem("jwt", res.data.Jwt)
+                localStorage.setItem("userId", res.data.UserId);
+                localStorage.setItem("role", "employer");
                 navigate("/home/employer");
             }).catch((err) => {
                 setMessage(err.response.data);
@@ -49,7 +51,7 @@ function RegisterEmployer() {
                 </Toast>
             </ToastContainer>
             <Row>
-                <NavigationBar />
+                <HomeMenu />
             </Row>
             <Row className="d-flex justify-content-center h-100 pt-5">
                 <Col md="auto">
@@ -71,12 +73,6 @@ function RegisterEmployer() {
                                     <Form.Label>Name</Form.Label>
                                     <Form.Control type="text" name="name" placeholder="Enter name" required />
                                 </Col>
-                                <Col>
-                                    <Form.Label>Profile picture</Form.Label>
-                                    <Form.Control type="file" name="profilePicture" />
-                                </Col>
-                            </Row>
-                            <Row className="mb-3">
                                 <Col>
                                     <Form.Label>Address</Form.Label>
                                     <Form.Control type="text" name="address" placeholder="Enter address" required />

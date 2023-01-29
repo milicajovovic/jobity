@@ -33,6 +33,7 @@ func RegisterPdf(dto models.RegisterDTO) (models.Employee, error) {
 
 	employee := PdfToEmployee(content)
 	employee.CV = dto.PdfPath
+	employee.Email = dto.Email
 	employee.Password = dto.Passwod
 	if repositories.UniqueEmail(employee.Email) {
 		return repositories.Create(employee)
@@ -71,8 +72,6 @@ func PdfToEmployee(content []string) models.Employee {
 			employee.FirstName = rowData[1]
 		case "last name":
 			employee.LastName = rowData[1]
-		case "email", "e-mail":
-			employee.Email = rowData[1]
 		case "birthday":
 			employee.Birthday, _ = time.Parse("DD-MM-YYYY", rowData[1])
 		case "education":
@@ -86,11 +85,23 @@ func PdfToEmployee(content []string) models.Employee {
 	return employee
 }
 
-func Update(employee models.Employee) (models.Employee, error) {
-	if repositories.UniqueEmail(employee.Email) {
-		return repositories.Update(employee)
+func UpdateForm(employee models.Employee) (models.Employee, error) {
+	return repositories.Update(employee)
+}
+
+func UpdatePdf(dto models.RegisterDTO) (models.Employee, error) {
+	content, err := ReadPdf("data/" + dto.PdfPath)
+	if err != nil {
+		return models.Employee{}, err
 	}
-	return models.Employee{}, errors.New("email must be unique")
+
+	employee := PdfToEmployee(content)
+	employee.CV = dto.PdfPath
+	employee.Email = dto.Email
+	employee.Password = dto.Passwod
+	employee.ID = dto.EmployeeID
+
+	return repositories.Update(employee)
 }
 
 func Login(dto models.LoginDTO) (models.Employee, error) {

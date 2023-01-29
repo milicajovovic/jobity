@@ -13,7 +13,8 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/employee/:id", GetById)
 	app.Post("/register/form", RegisterForm)
 	app.Post("/register/pdf", RegisterPdf)
-	app.Post("/update", Update)
+	app.Post("/update/form", UpdateForm)
+	app.Post("/update/pdf", UpdatePdf)
 	app.Post("/login", Login)
 }
 
@@ -66,13 +67,26 @@ func RegisterPdf(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(employee)
 }
 
-func Update(c *fiber.Ctx) error {
+func UpdateForm(c *fiber.Ctx) error {
 	var updatedEmployee models.Employee
 	if err := c.BodyParser(&updatedEmployee); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	employee, err := services.Update(updatedEmployee)
+	employee, err := services.UpdateForm(updatedEmployee)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(employee)
+}
+
+func UpdatePdf(c *fiber.Ctx) error {
+	var dto models.RegisterDTO
+	if err := c.BodyParser(&dto); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	employee, err := services.UpdatePdf(dto)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

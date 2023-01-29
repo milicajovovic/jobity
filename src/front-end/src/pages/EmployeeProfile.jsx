@@ -1,20 +1,27 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, Toast, Form, Button, Container, Row, Col, Card } from "react-bootstrap";
-import HomeMenu from "../components/HomeMenu";
+import React, { useEffect, useState } from "react";
+import { Col, Container, Row, Card, ToastContainer, Toast, Form, Button } from "react-bootstrap";
+import EmployeeMenu from "../components/EmployeeMenu";
 
-function RegisterEmployee() {
+function EmployeeProfile() {
     const [show, setShow] = useState(false);
     const [message, setMessage] = useState("");
+    const [employee, setEmployee] = useState({});
     const [types, setTypes] = useState([]);
+    const [typesSame, setTypesSame] = useState(true);
     const [skills, setSkills] = useState([]);
+    const [skillsSame, setSkillsSame] = useState(true);
     const [checkedTypes] = useState([]);
     const [checkedSkills] = useState([]);
     const [noPdf, setNoPdf] = useState(false);
-    const navigate = useNavigate();
 
     useEffect(() => {
+        const jwt = localStorage.getItem("jwt");
+        const userId = localStorage.getItem("userId");
+        axios.get("http://localhost:3007/employees/employee/" + userId, { headers: { Authorization: jwt } }).then(res => {
+            setEmployee(res.data);
+        });
+
         axios.get("http://localhost:3007/ads/jobTypes").then(res => {
             setTypes(res.data);
         });
@@ -24,32 +31,41 @@ function RegisterEmployee() {
         });
     }, []);
 
-    const register = (event) => {
+    const update = (event) => {
         event.preventDefault();
 
-        const newEmployee = {
-            "Email": event.target.email.value,
-            "Password": event.target.password.value,
+        let password = event.target.password.value;
+        if (password === "Password") {
+            password = employee.Password;
+        }
+
+        let userId = parseInt(localStorage.getItem("userId"));
+        const updatedEmployee = {
+            "ID": userId,
+            "Email": employee.Email,
+            "Password": password,
             "FirstName": event.target.firstName.value,
             "LastName": event.target.lastName.value,
-            "Birthday": new Date(event.target.birthday.value).toISOString(),
+            "Birthday": employee.Birthday,
             "Education": event.target.education.value,
-            "JobType": checkedTypes,
-            "Skills": checkedSkills,
+            "JobType": typesSame ? employee.JobType : checkedTypes,
+            "Skills": skillsSame ? employee.Skills : checkedSkills,
             "CV": event.target.cv.value,
         };
 
-        if (newEmployee.CV !== "") {
+        let jwt = localStorage.getItem("jwt");
+
+        if (updatedEmployee.CV !== "") {
             let dto = {
-                "PdfPath": newEmployee.CV.split("\\").pop(),
-                "Password": newEmployee.Password,
+                "PdfPath": updatedEmployee.CV.split("\\").pop(),
+                "Email": updatedEmployee.Email,
+                "Password": updatedEmployee.Password,
+                "EmployeeID": userId
             };
 
-            axios.post("http://localhost:3007/employees/register/pdf", dto).then(res => {
-                localStorage.setItem("jwt", res.data.Jwt)
-                localStorage.setItem("userId", res.data.UserId);
-                localStorage.setItem("role", "employee");
-                navigate("/employee/home");
+            axios.post("http://localhost:3007/employees/update/pdf", dto, { headers: { Authorization: jwt } }).then(res => {
+                setMessage("successfully updated");
+                setShow(true);
             }).catch((err) => {
                 setMessage(err.response.data);
                 setShow(true);
@@ -57,22 +73,15 @@ function RegisterEmployee() {
         } else {
             setNoPdf(true);
 
-            if (validEmail(newEmployee.Email)) {
-                axios.post("http://localhost:3007/employees/register/form", newEmployee).then(res => {
-                    localStorage.setItem("jwt", res.data.Jwt)
-                    localStorage.setItem("userId", res.data.UserId);
-                    localStorage.setItem("role", "employee");
-                    navigate("/employee/home");
-                }).catch((err) => {
-                    setMessage(err.response.data);
-                    setShow(true);
-                });
-            } else {
-                setMessage("email is not valid");
+            axios.post("http://localhost:3007/employees/update/form", updatedEmployee, { headers: { Authorization: jwt } }).then(res => {
+                setMessage("successfully updated");
                 setShow(true);
-            }
+            }).catch((err) => {
+                setMessage(err.response.data);
+                setShow(true);
+            });
         }
-    }
+    };
 
     const typesChanged = (event) => {
         if (event.target.checked) {
@@ -80,6 +89,14 @@ function RegisterEmployee() {
         } else {
             checkedTypes.splice(checkedTypes.indexOf(event.target.id));
         }
+        setTypesSame(false);
+    };
+
+    const employesType = (type) => {
+        if (employee.JobType !== undefined) {
+            return employee.JobType.includes(type);
+        }
+        return false;
     };
 
     const skillsChanged = (event) => {
@@ -88,65 +105,61 @@ function RegisterEmployee() {
         } else {
             checkedSkills.splice(checkedTypes.indexOf(event.target.id));
         }
+        setSkillsSame(false);
     };
 
-    const validEmail = (email) => {
-        let emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-        if (email.match(emailRegex)) {
-            return true;
+    const employesSkill = (skill) => {
+        if (employee.Skills !== undefined) {
+            return employee.Skills.includes(skill);
         }
         return false;
     };
 
     return (
         <Container fluid>
+            <Row>
+                <EmployeeMenu />
+            </Row>
             <ToastContainer position="top-center" className="text-center p-3">
                 <Toast onClose={() => setShow(false)} show={show} delay={3000} autohide>
                     <Toast.Body>{message}</Toast.Body>
                 </Toast>
             </ToastContainer>
-            <Row>
-                <HomeMenu />
-            </Row>
             <Row className="d-flex justify-content-center h-100 pt-5">
                 <Col md="auto">
                     <Card body style={{ width: "40rem" }}>
-                        <Card.Title className="text-center mt-3 mb-3" as="h3">Register as employee</Card.Title>
-                        <Form onSubmit={register}>
+                        <Card.Title className="text-center mt-3 mb-3" as="h3">My profile</Card.Title>
+                        <Form onSubmit={update}>
                             <Row className="mb-3">
                                 <Col>
                                     <Form.Label>Email</Form.Label>
-                                    <Form.Control type="text" name="email" placeholder="Enter email" required={noPdf} />
+                                    <Form.Control type="text" name="email" defaultValue={employee.Email} required={noPdf} disabled />
                                 </Col>
                                 <Col>
                                     <Form.Label>Password</Form.Label>
-                                    <Form.Control type="password" name="password" placeholder="Enter password" required />
+                                    <Form.Control type="password" name="password" defaultValue="Password" required />
                                 </Col>
                             </Row>
                             <Row className="mb-3">
                                 <Col>
                                     <Form.Label>First name</Form.Label>
-                                    <Form.Control type="text" name="firstName" placeholder="Enter first name" required={noPdf} />
+                                    <Form.Control type="text" name="firstName" defaultValue={employee.FirstName} required={noPdf} />
                                 </Col>
                                 <Col>
                                     <Form.Label>Last name</Form.Label>
-                                    <Form.Control type="text" name="lastName" placeholder="Enter last name" required={noPdf} />
+                                    <Form.Control type="text" name="lastName" defaultValue={employee.LastName} required={noPdf} />
                                 </Col>
                             </Row>
                             <Row className="mb-3">
                                 <Col>
-                                    <Form.Label>Birthday</Form.Label>
-                                    <Form.Control type="date" name="birthday" required={noPdf} />
-                                </Col>
-                                <Col>
                                     <Form.Label>CV in PDF</Form.Label>
-                                    <Form.Control type="file" name="cv" />
+                                    <Form.Control type="file" name="cv" defaultValue={employee.CV} />
                                 </Col>
                             </Row>
                             <Row className="mb-3">
                                 <Col>
                                     <Form.Label>Education</Form.Label>
-                                    <Form.Control as="textarea" rows={2} name="education" placeholder="Enter education" />
+                                    <Form.Control as="textarea" rows={2} name="education" defaultValue={employee.Education} />
                                 </Col>
                             </Row>
                             <Row className="mb-3">
@@ -161,6 +174,7 @@ function RegisterEmployee() {
                                                 inline
                                                 type="checkbox"
                                                 onChange={typesChanged}
+                                                defaultChecked={employesType(type)}
                                             />
                                         ))}
                                     </div>
@@ -178,6 +192,7 @@ function RegisterEmployee() {
                                                 inline
                                                 type="checkbox"
                                                 onChange={skillsChanged}
+                                                defaultChecked={employesSkill(skill)}
                                             />
                                         ))}
                                     </div>
@@ -186,7 +201,7 @@ function RegisterEmployee() {
                             <Row>
                                 <Col className="d-grid">
                                     <Button variant="primary" type="submit" className="mb-2">
-                                        Sign in
+                                        Save changes
                                     </Button>
                                 </Col>
                             </Row>
@@ -198,4 +213,4 @@ function RegisterEmployee() {
     )
 }
 
-export default RegisterEmployee
+export default EmployeeProfile

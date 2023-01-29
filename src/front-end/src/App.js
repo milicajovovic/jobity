@@ -6,6 +6,10 @@ import RegisterHome from "./pages/RegisterHome";
 import RegisterEmployee from "./pages/RegisterEmployee";
 import RegisterEmployer from "./pages/RegisterEmployer";
 import LoginHome from "./pages/LoginHome";
+import LoginEmployee from "./pages/LoginEmployee";
+import EmployeeHome from "./pages/EmployeeHome";
+import EmployeeProfile from "./pages/EmployeeProfile";
+import EmployeeEmployers from "./pages/EmployeeEmployers";
 
 function App() {
   return (
@@ -16,6 +20,10 @@ function App() {
         <Route path="/register/employee" element={<RegisterEmployee />} />
         <Route path="/register/employer" element={<RegisterEmployer />} />
         <Route path="/login" element={<LoginHome />} />
+        <Route path="/login/employee" element={<LoginEmployee />} />
+        <Route path="/employee/home" element={<EmployeeHome />} />
+        <Route path="/employee/profile" element={<EmployeeProfile />} />
+        <Route path="/employee/employers" element={<EmployeeEmployers />} />
       </Routes>
     </BrowserRouter>
   );

@@ -50,11 +50,11 @@ func Apply(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid employee ID")
 	}
 
-	ad, err := services.Apply(adId, employeeId)
+	application, err := services.Apply(adId, employeeId)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
-	return c.Status(fiber.StatusOK).JSON(ad)
+	return c.Status(fiber.StatusOK).JSON(application)
 }
 
 func GetAccepted(c *fiber.Ctx) error {
