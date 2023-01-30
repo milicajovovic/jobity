@@ -16,6 +16,8 @@ func SetupRoutes(app *fiber.App) {
 	app.Post("/update/form", UpdateForm)
 	app.Post("/update/pdf", UpdatePdf)
 	app.Post("/login", Login)
+	app.Post("/block/:id", Block)
+	app.Post("/delete/:id", Delete)
 }
 
 func GetAll(c *fiber.Ctx) error {
@@ -100,6 +102,34 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	employee, err := services.Login(dto)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(employee)
+}
+
+func Block(c *fiber.Ctx) error {
+	paramId := c.Params("id")
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid ID")
+	}
+
+	employee, err := services.Block(id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(employee)
+}
+
+func Delete(c *fiber.Ctx) error {
+	paramId := c.Params("id")
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid ID")
+	}
+
+	employee, err := services.Delete(id)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

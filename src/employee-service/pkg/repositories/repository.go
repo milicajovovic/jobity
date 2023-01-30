@@ -73,3 +73,23 @@ func Login(dto models.LoginDTO) (models.Employee, error) {
 	}
 	return employee, nil
 }
+
+func Block(id int) (models.Employee, error) {
+	var employee models.Employee
+	result := config.DB.First(&employee, id).Update("blocked", true)
+
+	if result.Error != nil {
+		return models.Employee{}, result.Error
+	}
+	return employee, nil
+}
+
+func Delete(id int) (models.Employee, error) {
+	var employee models.Employee
+	result := config.DB.First(&employee, id).Update("deleted", true)
+
+	if result.Error != nil {
+		return models.Employee{}, result.Error
+	}
+	return employee, nil
+}

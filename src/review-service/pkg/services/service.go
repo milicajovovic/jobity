@@ -20,3 +20,11 @@ func Create(review models.Review) (models.Review, error) {
 	}
 	return models.Review{}, errors.New("you already left a review for this employer")
 }
+
+func Appropriate(id int) (models.Review, error) {
+	return repositories.Appropriate(id)
+}
+
+func Delete(id int) (models.Review, error) {
+	return repositories.Delete(id)
+}

@@ -87,4 +87,54 @@ func SetupReviewRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware) {
 
 		return c.Status(response.StatusCode).JSON(review)
 	})
+
+	// Mark review as appropriate
+	app.Post(reviewPrefix+"/appropriate/:id", auth.RequiresRoles([]string{"admin"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Post(reviewUrl+"/appropriate/"+paramId, "application/json", nil)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var review models.Review
+		err = json.NewDecoder(response.Body).Decode(&review)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(review)
+	})
+
+	// Delete review
+	app.Post(reviewPrefix+"/delete/:id", auth.RequiresRoles([]string{"admin"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Post(reviewUrl+"/delete/"+paramId, "application/json", nil)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var review models.Review
+		err = json.NewDecoder(response.Body).Decode(&review)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(review)
+	})
 }

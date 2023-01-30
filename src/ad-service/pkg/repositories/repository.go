@@ -55,3 +55,13 @@ func SearchByNameAndDescription(name string, description string) ([]models.Ad, e
 	}
 	return ads, nil
 }
+
+func Delete(id int) (models.Ad, error) {
+	var ad models.Ad
+	result := config.DB.First(&ad, id).Update("deleted", true)
+
+	if result.Error != nil {
+		return models.Ad{}, result.Error
+	}
+	return ad, nil
+}

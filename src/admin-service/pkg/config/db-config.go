@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	db     *gorm.DB
+	DB     *gorm.DB
 	err    error
 	admins = []models.Admin{
 		{
@@ -31,16 +31,21 @@ func HashPassword(password string) string {
 	return string(bytes)
 }
 
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 func InitDB() {
 	dsn := "host=localhost user=postgres password=postgres dbname=admins port=5432 sslmode=disable"
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	db.Migrator().DropTable("admins")
-	db.AutoMigrate(&models.Admin{})
+	DB.Migrator().DropTable("admins")
+	DB.AutoMigrate(&models.Admin{})
 	for _, admin := range admins {
-		db.Create(&admin)
+		DB.Create(&admin)
 	}
 }

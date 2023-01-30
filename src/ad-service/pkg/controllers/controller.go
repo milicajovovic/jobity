@@ -13,6 +13,7 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/search/:name/:description", Search)
 	app.Get("/jobTypes", GetJobTypes)
 	app.Get("/requiredSkills", GetRequiredSkills)
+	app.Post("/delete/:id", Delete)
 }
 
 func GetAll(c *fiber.Ctx) error {
@@ -92,4 +93,18 @@ func removeDuplicates(slice []string) []string {
 		}
 	}
 	return unique
+}
+
+func Delete(c *fiber.Ctx) error {
+	paramId := c.Params("id")
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid ID")
+	}
+
+	ad, err := services.Delete(id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(ad)
 }

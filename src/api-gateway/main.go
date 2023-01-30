@@ -63,7 +63,7 @@ func main() {
 		},
 	})
 
-	// routes.SetupAdminRoutes(app, auth)
+	routes.SetupAdminRoutes(app, auth)
 	routes.SetupAdRoutes(app, auth)
 	routes.SetupApplicationRoutes(app, auth)
 	routes.SetupEmployeeRoutes(app, auth, enforcer)

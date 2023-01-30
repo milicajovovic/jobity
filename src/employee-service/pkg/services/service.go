@@ -107,3 +107,11 @@ func UpdatePdf(dto models.RegisterDTO) (models.Employee, error) {
 func Login(dto models.LoginDTO) (models.Employee, error) {
 	return repositories.Login(dto)
 }
+
+func Block(id int) (models.Employee, error) {
+	return repositories.Block(id)
+}
+
+func Delete(id int) (models.Employee, error) {
+	return repositories.Delete(id)
+}

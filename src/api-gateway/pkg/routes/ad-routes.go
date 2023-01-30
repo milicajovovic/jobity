@@ -136,4 +136,29 @@ func SetupAdRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware) {
 
 		return c.Status(response.StatusCode).JSON(requiredSkills)
 	})
+
+	// Delete ad
+	app.Post(adPrefix+"/delete/:id", auth.RequiresRoles([]string{"admin"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Post(adUrl+"/delete/"+paramId, "application/json", nil)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var ad models.Ad
+		err = json.NewDecoder(response.Body).Decode(&ad)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(ad)
+	})
 }

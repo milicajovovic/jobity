@@ -24,3 +24,7 @@ func Search(name string, description string) ([]models.Ad, error) {
 		return repositories.SearchByNameAndDescription(name, description)
 	}
 }
+
+func Delete(id int) (models.Ad, error) {
+	return repositories.Delete(id)
+}

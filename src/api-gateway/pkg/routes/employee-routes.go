@@ -207,4 +207,54 @@ func SetupEmployeeRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware, enf
 
 		return c.Status(response.StatusCode).JSON(dto)
 	})
+
+	// Block employee
+	app.Post(employeePrefix+"/block/:id", auth.RequiresRoles([]string{"admin"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Post(employeeUrl+"/block/"+paramId, "application/json", nil)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var employee models.Employee
+		err = json.NewDecoder(response.Body).Decode(&employee)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(employee)
+	})
+
+	// Delete employee
+	app.Post(employeePrefix+"/delete/:id", auth.RequiresRoles([]string{"admin"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Post(employeeUrl+"/delete/"+paramId, "application/json", nil)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var employee models.Employee
+		err = json.NewDecoder(response.Body).Decode(&employee)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(employee)
+	})
 }

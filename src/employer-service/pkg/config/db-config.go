@@ -41,6 +41,11 @@ func HashPassword(password string) string {
 	return string(bytes)
 }
 
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 func InitDB() {
 	dsn := "host=localhost user=postgres password=postgres dbname=employers port=5432 sslmode=disable"
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})

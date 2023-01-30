@@ -39,3 +39,23 @@ func Create(review models.Review) (models.Review, error) {
 	}
 	return review, nil
 }
+
+func Appropriate(id int) (models.Review, error) {
+	var review models.Review
+	result := config.DB.First(&review, id).Update("inappropriate", false)
+
+	if result.Error != nil {
+		return models.Review{}, result.Error
+	}
+	return review, nil
+}
+
+func Delete(id int) (models.Review, error) {
+	var review models.Review
+	result := config.DB.First(&review, id).Update("deleted", true)
+
+	if result.Error != nil {
+		return models.Review{}, result.Error
+	}
+	return review, nil
+}
