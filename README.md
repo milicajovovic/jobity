@@ -33,14 +33,14 @@ Administrator ima uvid u čitav sistem, tj. može da pregleda sve korisnike, pos
 ### GoLang
 
 * API Gateway
-* Mikroservis za neautentifikovane korisnike
 * Mikroservis za radnike
 * Mikroservis za poslodavce
 * Mikroservis za administratore
 * Mikroservis za oglase
 * Mikroservis za ocene i komentare
+* Mikroservis za prijave na oglase
 
-### Pharo
+### Rust
 
 * Mikroservis za e-mail
 
