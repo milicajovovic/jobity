@@ -43,7 +43,7 @@ func SetupEmployeeRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware, enf
 	})
 
 	// Get employee by id
-	app.Get(employeePrefix+"/employee/:id", auth.RequiresRoles([]string{"employee"}), func(c *fiber.Ctx) error {
+	app.Get(employeePrefix+"/employee/:id", func(c *fiber.Ctx) error {
 		paramId := c.Params("id")
 		response, err := http.Get(employeeUrl + "/employee/" + paramId)
 

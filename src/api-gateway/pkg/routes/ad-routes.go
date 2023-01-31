@@ -2,6 +2,7 @@ package routes
 
 import (
 	"ad-service/pkg/models"
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -39,7 +40,7 @@ func SetupAdRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware) {
 	})
 
 	// Get ad by id
-	app.Get(adPrefix+"/ad/:id", auth.RequiresRoles([]string{"employee"}), func(c *fiber.Ctx) error {
+	app.Get(adPrefix+"/ad/:id", func(c *fiber.Ctx) error {
 		paramId := c.Params("id")
 		response, err := http.Get(adUrl + "/ad/" + paramId)
 
@@ -137,10 +138,83 @@ func SetupAdRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware) {
 		return c.Status(response.StatusCode).JSON(requiredSkills)
 	})
 
+	// Update ad
+	app.Post(adPrefix+"/update", auth.RequiresRoles([]string{"employer"}), func(c *fiber.Ctx) error {
+		response, err := http.Post(adUrl+"/update", "application/json", bytes.NewBuffer(c.Body()))
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var ad models.Ad
+		err = json.NewDecoder(response.Body).Decode(&ad)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(ad)
+	})
+
 	// Delete ad
-	app.Post(adPrefix+"/delete/:id", auth.RequiresRoles([]string{"admin"}), func(c *fiber.Ctx) error {
+	app.Post(adPrefix+"/delete/:id", func(c *fiber.Ctx) error {
 		paramId := c.Params("id")
 		response, err := http.Post(adUrl+"/delete/"+paramId, "application/json", nil)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var ad models.Ad
+		err = json.NewDecoder(response.Body).Decode(&ad)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(ad)
+	})
+
+	// Get all employer's ads
+	app.Get(adPrefix+"/employer/:id", auth.RequiresRoles([]string{"employer"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Get(adUrl + "/employer/" + paramId)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var ads []models.Ad
+		err = json.NewDecoder(response.Body).Decode(&ads)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(ads)
+	})
+
+	// Create ad
+	app.Post(adPrefix+"/create", auth.RequiresRoles([]string{"employer"}), func(c *fiber.Ctx) error {
+		response, err := http.Post(adUrl+"/create", "application/json", bytes.NewBuffer(c.Body()))
 
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())

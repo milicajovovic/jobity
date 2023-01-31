@@ -16,6 +16,7 @@ var (
 		{
 			AdID:       1,
 			EmployeeID: 1,
+			EmployerID: 1,
 			Status:     models.PassedInterview,
 		},
 	}

@@ -39,9 +39,8 @@ function EmployeeProfile() {
             password = employee.Password;
         }
 
-        let userId = parseInt(localStorage.getItem("userId"));
         const updatedEmployee = {
-            "ID": userId,
+            "ID": employee.ID,
             "Email": employee.Email,
             "Password": password,
             "FirstName": event.target.firstName.value,
@@ -60,7 +59,7 @@ function EmployeeProfile() {
                 "PdfPath": updatedEmployee.CV.split("\\").pop(),
                 "Email": updatedEmployee.Email,
                 "Password": updatedEmployee.Password,
-                "EmployeeID": userId
+                "EmployeeID": employee.ID
             };
 
             axios.post("http://localhost:3007/employees/update/pdf", dto, { headers: { Authorization: jwt } }).then(res => {
@@ -133,7 +132,7 @@ function EmployeeProfile() {
                             <Row className="mb-3">
                                 <Col>
                                     <Form.Label>Email</Form.Label>
-                                    <Form.Control type="text" name="email" defaultValue={employee.Email} required={noPdf} disabled />
+                                    <Form.Control type="text" name="email" defaultValue={employee.Email} disabled />
                                 </Col>
                                 <Col>
                                     <Form.Label>Password</Form.Label>

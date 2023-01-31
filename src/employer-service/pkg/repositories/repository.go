@@ -64,6 +64,16 @@ func Login(dto models.LoginDTO) (models.Employer, error) {
 	return employer, nil
 }
 
+func Update(employer models.Employer) (models.Employer, error) {
+	employer.Password = config.HashPassword(employer.Password)
+	result := config.DB.Save(&employer)
+
+	if result.Error != nil {
+		return models.Employer{}, result.Error
+	}
+	return employer, nil
+}
+
 func Delete(id int) (models.Employer, error) {
 	var employer models.Employer
 	result := config.DB.First(&employer, id).Update("deleted", true)

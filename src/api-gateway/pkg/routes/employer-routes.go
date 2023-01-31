@@ -128,6 +128,30 @@ func SetupEmployerRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware, enf
 		return c.Status(response.StatusCode).JSON(dto)
 	})
 
+	// Update employer
+	app.Post(employerPrefix+"/update", auth.RequiresRoles([]string{"employer"}), func(c *fiber.Ctx) error {
+		response, err := http.Post(employerUrl+"/update", "application/json", bytes.NewBuffer(c.Body()))
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var employer models.Employer
+		err = json.NewDecoder(response.Body).Decode(&employer)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(employer)
+	})
+
 	// Delete employer
 	app.Post(employerPrefix+"/delete/:id", auth.RequiresRoles([]string{"admin"}), func(c *fiber.Ctx) error {
 		paramId := c.Params("id")

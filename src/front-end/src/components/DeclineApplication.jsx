@@ -4,21 +4,17 @@ import { useState } from "react";
 import { Button, Container, Toast, ToastContainer } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 
-function AdApplication(props) {
+function DeclineApplication(props) {
     const [show, setShow] = useState(false);
     const [message, setMessage] = useState("");
     
-    const apply = () => {
-        const jwt = localStorage.getItem("jwt");
-        const employeeId = parseInt(localStorage.getItem("userId"));
-        let application = {
-            "AdID": props.ad.ID,
-            "EmployerID": props.ad.EmployerID,
-            "EmployeeID": employeeId
-        }
+    const decline = () => {
+        let updatedApplication = props.application;
+        updatedApplication.Status = 1;
 
-        axios.post("http://localhost:3007/applications/apply", application, { headers: { Authorization: jwt } }).then(res => {
-            setMessage("successfully applied");
+        const jwt = localStorage.getItem("jwt");
+        axios.post("http://localhost:3007/applications/update", updatedApplication, { headers: { Authorization: jwt } }).then(res => {
+            setMessage("successfully declined");
             setShow(true);
         }).catch((err) => {
             setMessage(err.response.data);
@@ -42,18 +38,18 @@ function AdApplication(props) {
             >
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        Application - {props.ad.Name}
+                        Decline application
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to apply for this job?
+                    Are you sure you want to decline this application?
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={apply}>Apply</Button>
+                    <Button onClick={decline}>Decline</Button>
                 </Modal.Footer>
             </Modal>
         </Container>
     );
 }
 
-export default AdApplication
+export default DeclineApplication

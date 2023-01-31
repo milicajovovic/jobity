@@ -25,6 +25,10 @@ func Login(dto models.LoginDTO) (models.Employer, error) {
 	return repositories.Login(dto)
 }
 
+func Update(employer models.Employer) (models.Employer, error) {
+	return repositories.Update(employer)
+}
+
 func Delete(id int) (models.Employer, error) {
 	return repositories.Delete(id)
 }

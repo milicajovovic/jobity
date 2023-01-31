@@ -64,11 +64,34 @@ func SetupApplicationRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware) 
 		return c.Status(response.StatusCode).JSON(application)
 	})
 
+	// Get employer's applications
+	app.Get(applicationPrefix+"/employer/:id", auth.RequiresRoles([]string{"employer"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Get(applicationUrl + "/employer/" + paramId)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var applications []models.Application
+		err = json.NewDecoder(response.Body).Decode(&applications)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(applications)
+	})
+
 	// Apply to an ad - create application
-	app.Post(applicationPrefix+"/apply/:adId/:employeeId", auth.RequiresRoles([]string{"employee"}), func(c *fiber.Ctx) error {
-		adId := c.Params("adId")
-		employeeId := c.Params("employeeId")
-		response, err := http.Post(applicationUrl+"/apply/"+adId+"/"+employeeId, "application/json", bytes.NewBuffer(c.Body()))
+	app.Post(applicationPrefix+"/apply", auth.RequiresRoles([]string{"employee"}), func(c *fiber.Ctx) error {
+		response, err := http.Post(applicationUrl+"/apply", "application/json", bytes.NewBuffer(c.Body()))
 
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -94,6 +117,55 @@ func SetupApplicationRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware) 
 	app.Get(applicationPrefix+"/accepted/:id", auth.RequiresRoles([]string{"employee"}), func(c *fiber.Ctx) error {
 		paramId := c.Params("id")
 		response, err := http.Get(applicationUrl + "/accepted/" + paramId)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var applications []models.Application
+		err = json.NewDecoder(response.Body).Decode(&applications)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(applications)
+	})
+
+	// Update application
+	app.Post(applicationPrefix+"/update", auth.RequiresRoles([]string{"employer"}), func(c *fiber.Ctx) error {
+		response, err := http.Post(applicationUrl+"/update", "application/json", bytes.NewBuffer(c.Body()))
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var application models.Application
+		err = json.NewDecoder(response.Body).Decode(&application)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(application)
+	})
+
+	// Get employer's interviews
+	app.Get(applicationPrefix+"/interviews/:id", auth.RequiresRoles([]string{"employer"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Get(applicationUrl + "/interviews/" + paramId)
 
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())

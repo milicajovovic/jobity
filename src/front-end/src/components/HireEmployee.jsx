@@ -4,21 +4,17 @@ import { useState } from "react";
 import { Button, Container, Toast, ToastContainer } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 
-function AdApplication(props) {
+function HireEmployee(props) {
     const [show, setShow] = useState(false);
     const [message, setMessage] = useState("");
     
-    const apply = () => {
-        const jwt = localStorage.getItem("jwt");
-        const employeeId = parseInt(localStorage.getItem("userId"));
-        let application = {
-            "AdID": props.ad.ID,
-            "EmployerID": props.ad.EmployerID,
-            "EmployeeID": employeeId
-        }
+    const decide = (status) => {
+        let updatedApplication = props.application;
+        updatedApplication.Status = status;
 
-        axios.post("http://localhost:3007/applications/apply", application, { headers: { Authorization: jwt } }).then(res => {
-            setMessage("successfully applied");
+        const jwt = localStorage.getItem("jwt");
+        axios.post("http://localhost:3007/applications/update", updatedApplication, { headers: { Authorization: jwt } }).then(res => {
+            setMessage("successfully saved decision");
             setShow(true);
         }).catch((err) => {
             setMessage(err.response.data);
@@ -42,18 +38,19 @@ function AdApplication(props) {
             >
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        Application - {props.ad.Name}
+                        Hire employee
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to apply for this job?
+                    Do you want to hire employee?
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={apply}>Apply</Button>
+                    <Button onClick={() => decide(3)}>Yes</Button>
+                    <Button onClick={() => decide(1)}>No</Button>
                 </Modal.Footer>
             </Modal>
         </Container>
     );
 }
 
-export default AdApplication
+export default HireEmployee

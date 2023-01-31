@@ -13,6 +13,7 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/employer/:id", GetByEmployerId)
 	app.Post("/create", Create)
 	app.Post("/appropriate/:id", Appropriate)
+	app.Post("/inappropriate/:id", Inappropriate)
 	app.Post("/delete/:id", Delete)
 }
 
@@ -60,6 +61,20 @@ func Appropriate(c *fiber.Ctx) error {
 	}
 
 	review, err := services.Appropriate(id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(review)
+}
+
+func Inappropriate(c *fiber.Ctx) error {
+	paramId := c.Params("id")
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid ID")
+	}
+
+	review, err := services.Inappropriate(id)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

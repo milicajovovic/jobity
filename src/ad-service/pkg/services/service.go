@@ -25,6 +25,18 @@ func Search(name string, description string) ([]models.Ad, error) {
 	}
 }
 
+func Update(ad models.Ad) (models.Ad, error) {
+	return repositories.Update(ad)
+}
+
 func Delete(id int) (models.Ad, error) {
 	return repositories.Delete(id)
+}
+
+func GetByEmployerId(id int) ([]models.Ad, error) {
+	return repositories.GetByEmployerId(id)
+}
+
+func Create(ad models.Ad) (models.Ad, error) {
+	return repositories.Create(ad)
 }

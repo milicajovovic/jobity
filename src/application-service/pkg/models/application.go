@@ -17,6 +17,7 @@ type Application struct {
 	ID         int
 	AdID       int
 	EmployeeID int
+	EmployerID int
 	Status     ApplicationStatus
 	Interview  time.Time
 	Deleted    bool

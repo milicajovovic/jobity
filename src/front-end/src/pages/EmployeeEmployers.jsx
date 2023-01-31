@@ -12,8 +12,14 @@ function EmployeeEmployers() {
     const [showReview, setShowReview] = useState(false);
 
     useEffect(() => {
-        axios.get("http://localhost:3007/employers").then(res => {
-            setEmployers(res.data);
+        let jwt = localStorage.getItem("jwt");
+        let userId = localStorage.getItem("userId");
+        axios.get("http://localhost:3007/applications/accepted/" + userId, { headers: { Authorization: jwt } }).then(res => {
+            res.data.forEach(application => {
+                axios.get("http://localhost:3007/employers/employer/" + application.EmployerID).then(r => {
+                    setEmployers(current => [...current, r.data]);
+                });
+            });
         });
     }, []);
 

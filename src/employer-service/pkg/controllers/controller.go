@@ -13,6 +13,7 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/employer/:id", GetById)
 	app.Post("/register", Register)
 	app.Post("/login", Login)
+	app.Post("/update", Update)
 	app.Post("/delete/:id", Delete)
 }
 
@@ -59,6 +60,19 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	employer, err := services.Login(dto)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(employer)
+}
+
+func Update(c *fiber.Ctx) error {
+	var updatedEmployer models.Employer
+	if err := c.BodyParser(&updatedEmployer); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	employer, err := services.Update(updatedEmployer)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

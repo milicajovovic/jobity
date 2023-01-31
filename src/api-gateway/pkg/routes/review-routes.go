@@ -40,7 +40,7 @@ func SetupReviewRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware) {
 	})
 
 	// Get employer's reviews
-	app.Get(reviewPrefix+"/employer/:id", func(c *fiber.Ctx) error {
+	app.Get(reviewPrefix+"/employer/:id", auth.RequiresRoles([]string{"employer"}), func(c *fiber.Ctx) error {
 		paramId := c.Params("id")
 		response, err := http.Get(reviewUrl + "/employer/" + paramId)
 
@@ -92,6 +92,31 @@ func SetupReviewRoutes(app *fiber.App, auth *fibercasbin.CasbinMiddleware) {
 	app.Post(reviewPrefix+"/appropriate/:id", auth.RequiresRoles([]string{"admin"}), func(c *fiber.Ctx) error {
 		paramId := c.Params("id")
 		response, err := http.Post(reviewUrl+"/appropriate/"+paramId, "application/json", nil)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		defer response.Body.Close()
+
+		if response.Status != "200 OK" {
+			body, _ := io.ReadAll(response.Body)
+			return fiber.NewError(response.StatusCode, string(body))
+		}
+
+		var review models.Review
+		err = json.NewDecoder(response.Body).Decode(&review)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		return c.Status(response.StatusCode).JSON(review)
+	})
+
+	// Mark review as inappropriate
+	app.Post(reviewPrefix+"/inappropriate/:id", auth.RequiresRoles([]string{"employer"}), func(c *fiber.Ctx) error {
+		paramId := c.Params("id")
+		response, err := http.Post(reviewUrl+"/inappropriate/"+paramId, "application/json", nil)
 
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())

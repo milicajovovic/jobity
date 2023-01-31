@@ -25,6 +25,10 @@ func Appropriate(id int) (models.Review, error) {
 	return repositories.Appropriate(id)
 }
 
+func Inappropriate(id int) (models.Review, error) {
+	return repositories.Inappropriate(id)
+}
+
 func Delete(id int) (models.Review, error) {
 	return repositories.Delete(id)
 }

@@ -20,13 +20,20 @@ func SetupPolicies(enforcer *casbin.Enforcer) {
 	enforcer.AddPolicy("admin", "/ads/ad/:id", "GET")
 	enforcer.AddPolicy("employee", "/ads/ad/:id", "GET")
 	enforcer.AddPolicy("employer", "/ads/ad/:id", "GET")
+	enforcer.AddPolicy("employer", "/ads/update", "POST")
 	enforcer.AddPolicy("admin", "/ads/delete/:id", "POST")
+	enforcer.AddPolicy("employer", "/ads/delete/:id", "POST")
+	enforcer.AddPolicy("employer", "/ads/employer/:id", "GET")
+	enforcer.AddPolicy("employer", "/ads/create", "POST")
 
 	// Policies for application-service
 	enforcer.AddPolicy("admin", "/applications", "GET")
 	enforcer.AddPolicy("employer", "/applications/application/:id", "GET")
-	enforcer.AddPolicy("employee", "/applications/apply/:adId/:employeeId", "POST")
+	enforcer.AddPolicy("employer", "/applications/employer/:id", "GET")
+	enforcer.AddPolicy("employee", "/applications/apply", "POST")
 	enforcer.AddPolicy("employee", "/applications/accepted/:id", "GET")
+	enforcer.AddPolicy("employer", "/applications/update", "POST")
+	enforcer.AddPolicy("employer", "/applications/interviews/:id", "GET")
 
 	// Policies for employee-service
 	enforcer.AddPolicy("admin", "/employees", "GET")
@@ -40,11 +47,14 @@ func SetupPolicies(enforcer *casbin.Enforcer) {
 	// Policies for employer-service
 	enforcer.AddPolicy("admin", "/employers", "GET")
 	enforcer.AddPolicy("employee", "/employers", "GET")
+	enforcer.AddPolicy("employer", "/employers/update", "POST")
 	enforcer.AddPolicy("admin", "/employers/delete/:id", "POST")
 
 	// Policies for review-service
 	enforcer.AddPolicy("admin", "/reviews", "GET")
+	enforcer.AddPolicy("employer", "/reviews/employer/:id", "GET")
 	enforcer.AddPolicy("employee", "/reviews/create", "POST")
 	enforcer.AddPolicy("admin", "/reviews/appropriate/:id", "POST")
+	enforcer.AddPolicy("employer", "/reviews/inappropriate/:id", "POST")
 	enforcer.AddPolicy("admin", "/reviews/delete/:id", "POST")
 }

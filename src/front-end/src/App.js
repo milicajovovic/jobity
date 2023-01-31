@@ -16,6 +16,12 @@ import AdminEmployees from "./pages/AdminEmployees";
 import AdminEmployers from "./pages/AdminEmployers";
 import AdminAds from "./pages/AdminAds";
 import AdminReviews from "./pages/AdminReviews";
+import EmployerHome from "./pages/EmployerHome";
+import EmployerProfile from "./pages/EmployerProfile";
+import CreateAd from "./pages/CreateAd";
+import EmployerReviews from "./pages/EmployerReviews";
+import EmployerApplications from "./pages/EmployerApplications";
+import EmployerInterviews from "./pages/EmployerInterviews";
 
 function App() {
   return (
@@ -36,6 +42,12 @@ function App() {
         <Route path="/admin/employers" element={<AdminEmployers />} />
         <Route path="/admin/ads" element={<AdminAds />} />
         <Route path="/admin/reviews" element={<AdminReviews />} />
+        <Route path="/employer/home" element={<EmployerHome />} />
+        <Route path="/employer/profile" element={<EmployerProfile />} />
+        <Route path="/employer/ad" element={<CreateAd />} />
+        <Route path="/employer/reviews" element={<EmployerReviews />} />
+        <Route path="/employer/applications" element={<EmployerApplications />} />
+        <Route path="/employer/interviews" element={<EmployerInterviews />} />
       </Routes>
     </BrowserRouter>
   );
