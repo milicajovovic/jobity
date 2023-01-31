@@ -1,2 +1,3 @@
 pkg/mod
 pkg/sumdb
+src/email-service/target
